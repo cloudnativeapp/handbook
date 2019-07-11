@@ -10,7 +10,7 @@ Helm作为当前最流行的Kubernetes应用管理工具之一，整合应用部
 
 #### 开始创作
 
-首先，我们需要有一个要部署的应用。这里我们使用一个简单的基于golang的[hello world HTTP服务](src/)。该服务通过读取环境变量`USERNAME`获得用户自己定义的名称，然后监听80端口。对于任意HTTP请求，返回`Hello ${USERNAME}。`比如如果设置`USERNAME=world`（默认场景），该服务会返回`Hello world`。
+首先，我们需要有一个要部署的应用。这里我们使用一个简单的基于golang的[hello world HTTP服务](https://github.com/cloudnativeapp/handbook/tree/master/helm-chart-creation-tutorial/src/main.go)。该服务通过读取环境变量`USERNAME`获得用户自己定义的名称，然后监听80端口。对于任意HTTP请求，返回`Hello ${USERNAME}。`比如如果设置`USERNAME=world`（默认场景），该服务会返回`Hello world`。
 
 准备好要部署的应用镜像后，运行`helm create my-hello-world`，便会得到一个helm自动生成的空chart。这个chart里的名称是`my-hello-world`。
 **需要注意的是，Chart里面的my-hello-world名称需要和生成的Chart文件夹名称一致。如果修改my-hello-world，则需要做一致的修改。**
@@ -29,19 +29,19 @@ my-hello-world
 └── values.yaml
 ```
 
-在根目录下的*Chart.yaml*文件内，声明了当前Chart的名称、版本等基本信息，这些信息会在该Chart被放入仓库后，供用户浏览检索。比如我们可以把Chart的Description改成"My first hello world helm chart"。
+在根目录下的Chart.yaml文件内，声明了当前Chart的名称、版本等基本信息，这些信息会在该Chart被放入仓库后，供用户浏览检索。比如我们可以把Chart的Description改成"My first hello world helm chart"。
 
 #### 走近Chart
 
-Helm Chart对于应用的打包，不仅仅是将Deployment和Service以及其它资源整合在一起。我们看到*deployment.yaml*和*service.yaml*文件被放在*templates/*文件夹下，相较于原生的Kubernetes配置，多了很多渲染所用的可注入字段。比如在*deployment.yaml*的`spec.replicas`中，使用的是`.Values.replicaCount`而不是Kubernetes本身的静态数值。这个用来控制应用在Kubernetes上应该有多少运行副本的字段，在不同的应用部署环境下可以有不同的数值，而这个数值便是由注入的`Values`提供。
+Helm Chart对于应用的打包，不仅仅是将Deployment和Service以及其它资源整合在一起。我们看到deployment.yaml和service.yaml文件被放在templates/文件夹下，相较于原生的Kubernetes配置，多了很多渲染所用的可注入字段。比如在deployment.yaml的`spec.replicas`中，使用的是`.Values.replicaCount`而不是Kubernetes本身的静态数值。这个用来控制应用在Kubernetes上应该有多少运行副本的字段，在不同的应用部署环境下可以有不同的数值，而这个数值便是由注入的`Values`提供。
 
 在根目录下我们看到有一个`values.yaml`文件，这个文件提供了应用在安装时的默认参数。在默认的`Values`中，我们看到`replicaCount: 1`说明该应用在默认部署的状态下只有一个副本。
 
-为了使用我们要部署应用的镜像，我们看到*deployment.yaml*里在`spec.template.spec.containers`里，`image`和`imagePullPolicy`都使用了`Values`中的值。其中`image`字段由`.Values.image.repository`和`.Chart.AppVersion`组成。看到这里，同学们应该就知道我们需要变更的字段了，一个是位于*values.yaml*内的`image.repository`，另一个是位于*Chart.yaml*里的`AppVersion`。我们将它们与我们需要部署应用的docker镜像匹配起来。这里我们把*values.yaml*里的`image.repository`设置成`somefive/hello-world`，把*Chart.yaml*里的`AppVersion`设置成`1.0.0`即可。
+为了使用我们要部署应用的镜像，我们看到deployment.yaml里在`spec.template.spec.containers`里，`image`和`imagePullPolicy`都使用了`Values`中的值。其中`image`字段由`.Values.image.repository`和`.Chart.AppVersion`组成。看到这里，同学们应该就知道我们需要变更的字段了，一个是位于values.yaml内的`image.repository`，另一个是位于Chart.yaml里的`AppVersion`。我们将它们与我们需要部署应用的docker镜像匹配起来。这里我们把values.yaml里的`image.repository`设置成`somefive/hello-world`，把Chart.yaml里的`AppVersion`设置成`1.0.0`即可。
 
-类似的，我们可以查看*service.yaml*内我们要部署的服务，其中的主要配置也在*values.yaml*中。默认生成的服务将80端口暴露在Kubernetes集群内部。我们暂时不需要对这一部分进行修改。
+类似的，我们可以查看service.yaml内我们要部署的服务，其中的主要配置也在values.yaml中。默认生成的服务将80端口暴露在Kubernetes集群内部。我们暂时不需要对这一部分进行修改。
 
-由于部署的hello-world服务会从环境变量中读取`USERNAME`环境变量，我们将这个配置加入*deployment.yaml*。相关部分如下：
+由于部署的hello-world服务会从环境变量中读取`USERNAME`环境变量，我们将这个配置加入deployment.yaml。相关部分如下：
 
 ```yaml
 - name: {{ .Chart.Name }}
@@ -52,7 +52,7 @@ Helm Chart对于应用的打包，不仅仅是将Deployment和Service以及其�
       value: {{ .Values.Username }}
 ```
 
-现在我们的*deployment.yaml*模版会从*values.yaml*中加载`Username`字段，因此相应的，我们也在*values.yaml*中添加`Username: AppHub`。
+现在我们的deployment.yaml模版会从values.yaml中加载`Username`字段，因此相应的，我们也在values.yaml中添加`Username: AppHub`。
 
 #### 打包使用
 
@@ -67,7 +67,7 @@ Helm Chart对于应用的打包，不仅仅是将Deployment和Service以及其�
 
 接下来，我们运行`helm package my-hello-world`指令对我们的Chart文件夹进行打包。现在我们就得到了`my-hello-world-0.1.0.tgz`的Chart包。到这一步我们的Chart便已经完成了。
 
-之后，运行`helm instal my-hello-world-chart-test my-hello-world-0.1.0.tgz`来将本地的chart安装到*my-hello-world-chart-test*的Release中。运行`kubectl get pods`我们可以看到要部署的pod已经处于运行状态
+之后，运行`helm instal my-hello-world-chart-test my-hello-world-0.1.0.tgz`来将本地的chart安装到my-hello-world-chart-test的Release中。运行`kubectl get pods`我们可以看到要部署的pod已经处于运行状态
 
 ```bash
 NAME                                         READY   STATUS    RESTARTS   AGE
@@ -78,7 +78,7 @@ my-hello-world-chart-test-65d6c7b4b6-ptk4x   1/1     Running   0          4m3s
 
 #### 进阶使用
 
-上述提到*values.yaml*只是Helm install参数的默认设置，我们可以在安装Chart的过程中使用自己的参数覆盖。比如我们可以运行`helm install my-hello-world-chart-test2 my-hello-world-0.1.0.tgz --set Username="Cloud Native"`来安装一个新Chart。同样运行`kubectl port-forward`进行端口映射，这时可以得到`Hello Cloud Native`。
+上述提到values.yaml只是Helm install参数的默认设置，我们可以在安装Chart的过程中使用自己的参数覆盖。比如我们可以运行`helm install my-hello-world-chart-test2 my-hello-world-0.1.0.tgz --set Username="Cloud Native"`来安装一个新Chart。同样运行`kubectl port-forward`进行端口映射，这时可以得到`Hello Cloud Native`。
 
 我们注意到在安装Chart指令运行后，屏幕的输出会出现
 
@@ -90,7 +90,7 @@ NOTES:
   kubectl port-forward $POD_NAME 8080:80
 ```
 
-这里的注释是由Chart中的`templates/NOTES.txt`提供的。我们注意到原始的NOTES中，所写的`"app={{ template "my-hello-world.name" . }},release={{ .Release.Name }}"`和我们的*deployment.yaml*中所写的配置不太一样。我们可以把它改成`"app.kubernetes.io/name={{ template "my-hello-world.name" . }},app.kubernetes.io/instance={{ .Release.Name }}"`，将*values.yaml*中的`version`更新成`0.1.1`。然后重新打包Chart（运行`helm package`）。得到新的*my-hello-world-0.1.1.tgz*之后，重新安装Chart（运行`helm install my-hello-world-chart-test3 my-hello-world-0.1.1.tgz --set Username="New Chart"`），就能看到更新过后的NOTES了。
+这里的注释是由Chart中的`templates/NOTES.txt`提供的。我们注意到原始的NOTES中，所写的`"app={{ template "my-hello-world.name" . }},release={{ .Release.Name }}"`和我们的deployment.yaml中所写的配置不太一样。我们可以把它改成`"app.kubernetes.io/name={{ template "my-hello-world.name" . }},app.kubernetes.io/instance={{ .Release.Name }}"`，将values.yaml中的`version`更新成`0.1.1`。然后重新打包Chart（运行`helm package`）。得到新的my-hello-world-0.1.1.tgz之后，重新安装Chart（运行`helm install my-hello-world-chart-test3 my-hello-world-0.1.1.tgz --set Username="New Chart"`），就能看到更新过后的NOTES了。
 
 ```bash
 NAME: my-hello-world-chart-test3
