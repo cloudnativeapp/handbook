@@ -107,4 +107,4 @@ NOTES:
 
 #### 其他
 
-Helm Chart还有诸如dependency等其他功能，更加详细的资料可以参考Helm官方文档的[相关章节](https://v3.helm.sh/docs/chart_template_guide/#the-chart-template-developer-s-guide)。
+Helm Chart还有诸如dependency等其他功能，更加详细的资料可以参考Helm官方文档的[相关章节](https://v3.helm.sh/docs/topics/chart_template_guide/)。
