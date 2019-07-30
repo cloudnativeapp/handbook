@@ -37,7 +37,7 @@ Helm Chart对于应用的打包，不仅仅是将Deployment和Service以及其�
 
 在根目录下我们看到有一个`values.yaml`文件，这个文件提供了应用在安装时的默认参数。在默认的`Values`中，我们看到`replicaCount: 1`说明该应用在默认部署的状态下只有一个副本。
 
-为了使用我们要部署应用的镜像，我们看到deployment.yaml里在`spec.template.spec.containers`里，`image`和`imagePullPolicy`都使用了`Values`中的值。其中`image`字段由`.Values.image.repository`和`.Chart.AppVersion`组成。看到这里，同学们应该就知道我们需要变更的字段了，一个是位于values.yaml内的`image.repository`，另一个是位于Chart.yaml里的`AppVersion`。我们将它们与我们需要部署应用的docker镜像匹配起来。这里我们把values.yaml里的`image.repository`设置成`somefive/hello-world`，把Chart.yaml里的`AppVersion`设置成`1.0.0`即可。
+为了使用我们要部署应用的镜像，我们看到deployment.yaml里在`spec.template.spec.containers`里，`image`和`imagePullPolicy`都使用了`Values`中的值。其中`image`字段由`.Values.image.repository`和`.Chart.AppVersion`组成。看到这里，同学们应该就知道我们需要变更的字段了，一个是位于values.yaml内的`image.repository`，另一个是位于Chart.yaml里的`AppVersion`。我们将它们与我们需要部署应用的docker镜像匹配起来。这里我们把values.yaml里的`image.repository`设置成`somefive/hello-world`，`image.tag`设置成`1.0.0`即可。
 
 类似的，我们可以查看service.yaml内我们要部署的服务，其中的主要配置也在values.yaml中。默认生成的服务将80端口暴露在Kubernetes集群内部。我们暂时不需要对这一部分进行修改。
 
@@ -67,7 +67,7 @@ Helm Chart对于应用的打包，不仅仅是将Deployment和Service以及其�
 
 接下来，我们运行`helm package my-hello-world`指令对我们的Chart文件夹进行打包。现在我们就得到了`my-hello-world-0.1.0.tgz`的Chart包。到这一步我们的Chart便已经完成了。
 
-之后，运行`helm instal my-hello-world-chart-test my-hello-world-0.1.0.tgz`来将本地的chart安装到my-hello-world-chart-test的Release中。运行`kubectl get pods`我们可以看到要部署的pod已经处于运行状态
+之后，运行`helm install my-hello-world-chart-test my-hello-world-0.1.0.tgz`来将本地的chart安装到my-hello-world-chart-test的Release中。运行`kubectl get pods`我们可以看到要部署的pod已经处于运行状态
 
 ```bash
 NAME                                         READY   STATUS    RESTARTS   AGE
