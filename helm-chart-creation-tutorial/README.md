@@ -67,7 +67,7 @@ Helm Chart对于应用的打包，不仅仅是将Deployment和Service以及其�
 
 接下来，我们运行`helm package my-hello-world`指令对我们的Chart文件夹进行打包。现在我们就得到了`my-hello-world-0.1.0.tgz`的Chart包。到这一步我们的Chart便已经完成了。
 
-之后，运行`helm instal my-hello-world-chart-test my-hello-world-0.1.0.tgz`来将本地的chart安装到my-hello-world-chart-test的Release中。运行`kubectl get pods`我们可以看到要部署的pod已经处于运行状态
+之后，运行`helm install my-hello-world-chart-test my-hello-world-0.1.0.tgz`来将本地的chart安装到my-hello-world-chart-test的Release中。运行`kubectl get pods`我们可以看到要部署的pod已经处于运行状态
 
 ```bash
 NAME                                         READY   STATUS    RESTARTS   AGE
